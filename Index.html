@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Streaming Hub</title>
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #1a1a1a;
+            --bg-card: #1e1e1e;
+            --accent-pink: #ff69b4;
+            --accent-blue: #00bfff;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --link-color: #87cefa;
+            --border-radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            padding: 20px;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 32px rgba(255, 105, 180, 0.1);
+        }
+
+        h1 {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 30px 0;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+            font-weight: 600;
+            border: 2px solid transparent;
+        }
+
+        .btn:hover {
+            background: var(--accent-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 191, 255, 0.3);
+        }
+
+        .btn.active {
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
+            border-color: var(--text-primary);
+        }
+
+        .category {
+            margin: 20px 0;
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .category:hover {
+            box-shadow: 0 8px 32px rgba(0, 191, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .category-header {
+            padding: 20px 25px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(255, 105, 180, 0.05), rgba(0, 191, 255, 0.05));
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .category-header:hover {
+            background: linear-gradient(135deg, rgba(255, 105, 180, 0.1), rgba(0, 191, 255, 0.1));
+        }
+
+        .category-header h2 {
+            color: var(--accent-blue);
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .category-header:hover h2 {
+            color: var(--text-primary);
+        }
+
+        .toggle-icon {
+            font-size: 24px;
+            transition: var(--transition);
+            color: var(--accent-pink);
+        }
+
+        .category.active .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .category-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .category.active .category-content {
+            max-height: 5000px;
+        }
+
+        .content-inner {
+            padding: 25px;
+        }
+
+        .source-list {
+            list-style: none;
+            display: grid;
+            gap: 20px;
+        }
+
+        .source-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 20px;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .source-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent-blue);
+        }
+
+        .source-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .source-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        .source-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-embed {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .badge-external {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .source-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--link-color);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            background: rgba(135, 206, 250, 0.1);
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .source-link:hover {
+            background: var(--accent-blue);
+            color: var(--bg-primary);
+            transform: translateX(5px);
+        }
+
+        .embed-container {
+            margin-top: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        iframe {
+            width: 100%;
+            height: 500px;
+            border: none;
+            display: block;
+        }
+
+        .loading-placeholder {
+            background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+            border-radius: 8px;
+            height: 500px;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 15px; }
+            header { padding: 20px 15px; margin-bottom: 30px; }
+            .category-header { padding: 15px 20px; }
+            .content-inner { padding: 15px; }
+            iframe { height: 300px; }
+            .controls { gap: 10px; }
+            .btn { padding: 10px 18px; font-size: 13px; }
+        }
+
+        @media (max-width: 480px) {
+            .source-header { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎌 Anime Streaming Hub</h1>
+            <p class="subtitle">
+                Your centralized dashboard for free, legal anime streaming. Click categories to explore embeddable content and trusted platforms.
+            </p>
+        </header>
+
+        <div class="controls">
+            <button class="btn" onclick="expandAll()">Expand All</button>
+            <button class="btn" onclick="collapseAll()">Collapse All</button>
+        </div>
+
+        <!-- Action/Shonen Category -->
+        <div class="category" data-category="action">
+            <div class="category-header">
+                <h2>⚔️ Action / Shonen</h2>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="category-content">
+                <div class="content-inner">
+                    <ul class="source-list">
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">Crunchyroll Action</span>
+                                <span class="source-badge badge-external">External</span>
+                            </div>
+                            <a href="https://www.crunchyroll.com/videos/anime/genres/action" target="_blank" rel="noopener noreferrer" class="source-link">
+                                Open in New Tab →
+                            </a>
+                        </li>
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">Tubi Action Anime</span>
+                                <span class="source-badge badge-external">External</span>
+                            </div>
+                            <a href="https://tubitv.com/search/action%20anime" target="_blank" rel="noopener noreferrer" class="source-link">
+                                Open in New Tab →
+                            </a>
+                        </li>
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">Pluto TV Action</span>
+                                <span class="source-badge badge-embed">Embedded</span>
+                            </div>
+                            <div class="embed-container">
+                                <iframe 
+                                    src="https://pluto.tv/en/live-tv/pluto-tv-action" 
+                                    allow="fullscreen"
+                                    loading="lazy"
+                                    title="Pluto TV Action Channel">
+                                </iframe>
+                            </div>
+                        </li>
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">YouTube Action Playlist</span>
+                                <span class="source-badge badge-embed">Embedded</span>
+                            </div>
+                            <div class="embed-container">
+                                <iframe 
+                                    src="https://www.youtube.com/embed/videoseries?list=PLwazELwvw7f2wTHaeM5Gm3f_o_6IPs96v" 
+                                    allowfullscreen
+                                    loading="lazy"
+                                    title="YouTube Action Anime Playlist">
+                                </iframe>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Romance/Shojo Category -->
+        <div class="category" data-category="romance">
+            <div class="category-header">
+                <h2>💕 Romance / Shojo</h2>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="category-content">
+                <div class="content-inner">
+                    <ul class="source-list">
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">Crunchyroll Romance</span>
+                                <span class="source-badge badge-external">External</span>
+                            </div>
+                            <a href="https://www.crunchyroll.com/videos/anime/genres/romance" target="_blank" rel="noopener noreferrer" class="source-link">
+                                Open in New Tab →
+                            </a>
+                        </li>
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">Tubi Romance Anime</span>
+                                <span class="source-badge badge-external">External</span>
+                            </div>
+                            <a href="https://tubitv.com/search/romance%20anime" target="_blank" rel="noopener noreferrer" class="source-link">
+                                Open in New Tab →
+                            </a>
+                        </li>
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">Anime-Planet Romance</span>
+                                <span class="source-badge badge-external">External</span>
+                            </div>
+                            <a href="https://www.anime-planet.com/anime/tags/romance" target="_blank" rel="noopener noreferrer" class="source-link">
+                                Discover Series →
+                            </a>
+                        </li>
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">RetroCrush Romance</span>
+                                <span class="source-badge badge-external">External</span>
+                            </div>
+                            <a href="https://www.retrocrush.tv/browse?genre=romance" target="_blank" rel="noopener noreferrer" class="source-link">
+                                Open in New Tab →
+                            </a>
+                        </li>
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">YouTube Romance Playlist</span>
+                                <span class="source-badge badge-embed">Embedded</span>
+                            </div>
+                            <div class="embed-container">
+                                <iframe 
+                                    src="https://www.youtube.com/embed/videoseries?list=PLwazELwvw7f3jR6m8_J8n5jBZ4Hwm86EU" 
+                                    allowfullscreen
+                                    loading="lazy"
+                                    title="YouTube Romance Anime Playlist">
+                                </iframe>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fantasy/Adventure Category -->
+        <div class="category" data-category="fantasy">
+            <div class="category-header">
+                <h2>🗡️ Fantasy / Adventure</h2>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="category-content">
+                <div class="content-inner">
+                    <ul class="source-list">
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">Crunchyroll Fantasy</span>
+                                <span class="source-badge badge-external">External</span>
+                            </div>
+                            <a href="https://www.crunchyroll.com/videos/anime/genres/fantasy" target="_blank" rel="noopener noreferrer" class="source-link">
+                                Open in New Tab →
+                            </a>
+                        </li>
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">Roku Channel Fantasy</span>
+                                <span class="source-badge badge-external">External</span>
+                            </div>
+                            <a href="https://therokuchannel.roku.com/search/anime%20fantasy" target="_blank" rel="noopener noreferrer" class="source-link">
+                                Open in New Tab →
+                            </a>
+                        </li>
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">Pluto TV Fantasy</span>
+                                <span class="source-badge badge-embed">Embedded</span>
+                            </div>
+                            <div class="embed-container">
+                                <iframe 
+                                    src="https://pluto.tv/en/on-demand/search/fantasy+anime" 
+                                    allow="fullscreen"
+                                    loading="lazy"
+                                    title="Pluto TV Fantasy Anime">
+                                </iframe>
+                            </div>
+                        </li>
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">Anime-Planet Fantasy</span>
+                                <span class="source-badge badge-external">External</span>
+                            </div>
+                            <a href="https://www.anime-planet.com/anime/tags/fantasy" target="_blank" rel="noopener noreferrer" class="source-link">
+                                Discover Series →
+                            </a>
+                        </li>
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">YouTube Fantasy Playlist</span>
+                                <span class="source-badge badge-embed">Embedded</span>
+                            </div>
+                            <div class="embed-container">
+                                <iframe 
+                                    src="https://www.youtube.com/embed/videoseries?list=PLwazELwvw7f0bI4wOK8ei3vAH0OLxRCzj" 
+                                    allowfullscreen
+                                    loading="lazy"
+                                    title="YouTube Fantasy Anime Playlist">
+                                </iframe>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Classics/Retro Category -->
+        <div class="category" data-category="classics">
+            <div class="category-header">
+                <h2>📼 Classics / Retro</h2>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="category-content">
+                <div class="content-inner">
+                    <ul class="source-list">
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">RetroCrush Library</span>
+                                <span class="source-badge badge-external">External</span>
+                            </div>
+                            <a href="https://www.retrocrush.tv/browse" target="_blank" rel="noopener noreferrer" class="source-link">
+                                Open in New Tab →
+                            </a>
+                        </li>
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">Tubi Classics</span>
+                                <span class="source-badge badge-external">External</span>
+                            </div>
+                            <a href="https://tubitv.com/search/classic%20anime" target="_blank" rel="noopener noreferrer" class="source-link">
+                                Open in New Tab →
+                            </a>
+                        </li>
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">YouTube Gundam Channel</span>
+                                <span class="source-badge badge-embed">Embedded</span>
+                            </div>
+                            <div class="embed-container">
+                                <iframe 
+                                    src="https://www.youtube.com/embed/videoseries?list=PLJV1h9xQ7Hx-0WipavLDd4lilml7_K6in" 
+                                    allowfullscreen
+                                    loading="lazy"
+                                    title="YouTube Official Gundam Playlist">
+                                </iframe>
+                            </div>
+                        </li>
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">Ani.me Classics</span>
+                                <span class="source-badge badge-external">External</span>
+                            </div>
+                            <a href="https://ani.me/browse" target="_blank" rel="noopener noreferrer" class="source-link">
+                                Open in New Tab →
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- All Platforms Category -->
+        <div class="category active" data-category="all-platforms">
+            <div class="category-header">
+                <h2>🌐 All Platforms</h2>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="category-content">
+                <div class="content-inner">
+                    <ul class="source-list">
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">Crunchyroll</span>
+                                <span class="source-badge badge-external">External</span>
+                            </div>
+                            <a href="https://www.crunchyroll.com/videos/anime" target="_blank" rel="noopener noreferrer" class="source-link">
+                                Browse Library →
+                            </a>
+                        </li>
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">Tubi</span>
+                                <span class="source-badge badge-external">External</span>
+                            </div>
+                            <a href="https://tubitv.com/category/anime" target="_blank" rel="noopener noreferrer" class="source-link">
+                                Browse Library →
+                            </a>
+                        </li>
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">Pluto TV Anime</span>
+                                <span class="source-badge badge-embed">Embedded</span>
+                            </div>
+                            <div class="embed-container">
+                                <iframe 
+                                    src="https://pluto.tv/en/on-demand/categories/anime" 
+                                    allow="fullscreen"
+                                    loading="lazy"
+                                    title="Pluto TV Anime Category">
+                                </iframe>
+                            </div>
+                        </li>
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">RetroCrush</span>
+                                <span class="source-badge badge-external">External</span>
+                            </div>
+                            <a href="https://www.retrocrush.tv" target="_blank" rel="noopener noreferrer" class="source-link">
+                                Browse Library →
+                            </a>
+                        </li>
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">Roku Channel</span>
+                                <span class="source-badge badge-external">External</span>
+                            </div>
+                            <a href="https://therokuchannel.roku.com/browse/anime" target="_blank" rel="noopener noreferrer" class="source-link">
+                                Browse Library →
+                            </a>
+                        </li>
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">YouTube Anime Search</span>
+                                <span class="source-badge badge-embed">Embedded</span>
+                            </div>
+                            <div class="embed-container">
+                                <iframe 
+                                    src="https://www.youtube.com/embed?listType=search&list=free+legal+anime" 
+                                    allowfullscreen
+                                    loading="lazy"
+                                    title="YouTube Free Legal Anime Search">
+                                </iframe>
+                            </div>
+                        </li>
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">Ani.me</span>
+                                <span class="source-badge badge-external">External</span>
+                            </div>
+                            <a href="https://ani.me" target="_blank" rel="noopener noreferrer" class="source-link">
+                                Browse Library →
+                            </a>
+                        </li>
+                        <li class="source-item">
+                            <div class="source-header">
+                                <span class="source-name">Anime-Planet</span>
+                                <span class="source-badge badge-external">External</span>
+                            </div>
+                            <a href="https://www.anime-planet.com/anime/all" target="_blank" rel="noopener noreferrer" class="source-link">
+                                Discover Series →
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>All streaming services listed are free and legal. Some platforms may require registration.</p>
+            <p style="margin-top: 10px; opacity: 0.7;">Built for anime fans • Last updated January 2026</p>
+        </footer>
+    </div>
+
+    <script>
+        // Toggle individual categories
+        document.querySelectorAll('.category-header').forEach(header => {
+            header.addEventListener('click', function() {
+                const category = this.parentElement;
+                category.classList.toggle('active');
+            });
+        });
+
+        // Expand all categories
+        function expandAll() {
+            document.querySelectorAll('.category').forEach(cat => {
+                cat.classList.add('active');
+            });
+        }
+
+        // Collapse all categories
+        function collapseAll() {
+            document.querySelectorAll('.category').forEach(cat => {
+                cat.classList.remove('active');
+            });
+        }
+
+        // Lazy load iframes for performance
+        document.addEventListener('DOMContentLoaded', () => {
+            const iframeObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const iframe = entry.target;
+                        if (iframe.dataset.src) {
+                            iframe.src = iframe.dataset.src;
+                            iframe.removeAttribute('data-src');
+                            iframeObserver.unobserve(iframe);
+                        }
+                    }
+                });
+            }, { rootMargin: '50px' });
+
+            // Optional: Convert src to data-src for true lazy loading
+            // document.querySelectorAll('iframe').forEach(iframe => {
+            //     iframeObserver.observe(iframe);
+            // });
+        });
+
+        // Keyboard accessibility
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                collapseAll();
+            }
+        });
+    </script>
+</body>
+</html>
